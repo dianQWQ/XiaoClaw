@@ -1,71 +1,42 @@
-use xiao_claw::{Agent, AgentConfig, ToolRegistry, providers::{OpenAIProvider, AnthropicProvider, OpenRouterProvider, LLMProvider}};
+use xiao_claw::{Agent, AgentConfig, ToolRegistry, providers::{ZhipuProvider}};
 use std::sync::Arc;
-use std::env;
 
 #[tokio::main]
 async fn main() {
     println!("🤖 XiaoClaw - AI Agent");
     println!("=====================\n");
     
-    let api_key = env::var("OPENAI_API_KEY").or_else(|_| env::var("ANTHROPIC_API_KEY").or_else(|_| env::var("OPENROUTER_API_KEY")))
-        .expect("Please set OPENAI_API_KEY, ANTHROPIC_API_KEY, or OPENROUTER_API_KEY");
+    // 智谱AI (Zhipu/GLM)
+    let api_key = "32927116eed74c7caa3de62f4cc6c470.3DZZDNjYa0gnuXzw";
+    let model = "glm-4-flash";
     
-    let provider: Arc<dyn LLMProvider>;
-    let model: String;
+    println!("Using Zhipu Provider (GLM-4-Flash)");
     
-    if env::var("OPENAI_API_KEY").is_ok() {
-        println!("Using OpenAI Provider");
-        provider = Arc::new(OpenAIProvider::new(api_key));
-        model = "gpt-4o-mini".to_string();
-    } else if env::var("ANTHROPIC_API_KEY").is_ok() {
-        println!("Using Anthropic Provider");
-        provider = Arc::new(AnthropicProvider::new(api_key));
-        model = "claude-3-haiku-20240307".to_string();
-    } else {
-        println!("Using OpenRouter Provider");
-        provider = Arc::new(OpenRouterProvider::new(api_key));
-        model = "openai/gpt-4o-mini".to_string();
-    }
+    let provider = Arc::new(ZhipuProvider::new(api_key.to_string()));
     
     let config = AgentConfig {
-        model,
-        provider: "default".to_string(),
+        model: model.to_string(),
+        provider: "zhipu".to_string(),
         temperature: 0.7,
-        max_tokens: Some(4096),
-        system_prompt: Some("You are a helpful AI assistant.".into()),
+        max_tokens: Some(2048),
+        system_prompt: Some("你是一个helpful的AI助手，用中文回答。".into()),
         tools: vec![],
     };
     
     let tools = Arc::new(ToolRegistry::new());
-    let agent = xiao_claw::Agent::new(config, tools);
+    let mut agent = xiao_claw::Agent::new(config, tools);
+    agent.set_provider(provider);
     
-    println!("\n✅ Ready! Type 'quit' to exit.\n");
+    println!("✅ Sending test message...\n");
     
-    loop {
-        print!("You: ");
-        std::io::Write::flush(&mut std::io::stdout()).unwrap();
-        
-        let mut input = String::new();
-        std::io::stdin().read_line(&mut input).unwrap();
-        
-        let input = input.trim();
-        if input == "quit" || input == "exit" {
-            break;
+    match agent.process("你好，请介绍一下你自己").await {
+        Ok(response) => {
+            println!("Bot: {}\n", response.content);
         }
-        
-        if input.is_empty() {
-            continue;
-        }
-        
-        match agent.process(input).await {
-            Ok(response) => {
-                println!("Bot: {}\n", response.content);
-            }
-            Err(e) => {
-                println!("Error: {}\n", e);
-            }
+        Err(e) => {
+            println!("Error: {}\n", e);
         }
     }
     
-    println!("Goodbye!");
+    println!("Done!");
 }

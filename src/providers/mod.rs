@@ -1,10 +1,12 @@
 pub mod openai;
 pub mod anthropic;
 pub mod openrouter;
+pub mod zhipu;
 
 pub use openai::OpenAIProvider;
 pub use anthropic::AnthropicProvider;
 pub use openrouter::OpenRouterProvider;
+pub use zhipu::ZhipuProvider;
 
 use crate::{Message, Response, Error};
 use async_trait::async_trait;
