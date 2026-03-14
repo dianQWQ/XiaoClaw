@@ -46,6 +46,11 @@ XiaoClaw/
 │   │   ├── mod.rs        # Tool trait
 │   │   ├── registry.rs   # Tool registry
 │   │   └── builtin.rs    # Built-in tools
+│   ├── providers/        # LLM providers
+│   │   ├── mod.rs        # Provider trait
+│   │   ├── openai.rs     # OpenAI provider
+│   │   ├── anthropic.rs  # Anthropic provider
+│   │   └── openrouter.rs # OpenRouter provider
 │   ├── memory/           # SQLite memory store
 │   ├── session/          # Session management
 │   └── ffi/              # PyO3 bindings
@@ -62,11 +67,11 @@ XiaoClaw/
 
 - **Core Agent Loop**: LLM inference with tool calling (max 20 iterations)
 - **Tool System**: Built-in tools (filesystem, web_search, message, cron) + custom tool registration
+- **LLM Providers**: OpenAI, Anthropic, OpenRouter (100+ models via OpenRouter)
 - **Memory**: SQLite-based persistent memory with session support
 - **Session Management**: User session tracking with timeout
 - **Python FFI**: Bindings for Python integration (via PyO3)
 - **Channel Adapters**: Telegram, Discord, Feishu, CLI (Python side)
-- **Provider Support**: OpenAI, Anthropic, LiteLLM and 100+ providers (Python side)
 
 ### Build
 
@@ -92,21 +97,41 @@ maturin develop
 #### Rust
 
 ```rust
-use nanobot_core::{Agent, AgentConfig, ToolRegistry};
+use xiao_claw::{Agent, AgentConfig, ToolRegistry, providers::{OpenAIProvider, LLMProvider}};
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
     let config = AgentConfig {
-        model: "claude-3-haiku".into(),
+        model: "gpt-4o-mini".into(),
         provider: "openai".into(),
         temperature: 0.7,
         max_tokens: Some(4096),
-        system_prompt: None,
+        system_prompt: Some("You are a helpful AI assistant.".into()),
         tools: vec![],
     };
     
     let tools = Arc::new(ToolRegistry::new());
     let agent = Agent::new(config, tools);
+    
+    // Set provider
+    let provider = Arc::new(OpenAIProvider::new("your-api-key".to_string()));
+    agent.set_provider(provider);
+    
+    let response = agent.process("Hello!").await;
+    println!("Response: {:?}", response);
+}
+```
+
+#### CLI Example
+
+```bash
+# Set API key
+export OPENAI_API_KEY=sk-...
+
+# Run interactive chat
+cargo run --example run
+```
     
     let response = agent.process("Hello!").await;
     println!("Response: {:?}", response);
@@ -169,6 +194,7 @@ MIT
 │  - Agent 循环 (LLM + 工具调用)           │
 │  - 上下文构建器                          │
 │  - 工具注册表                           │
+│  - LLM 提供商 (OpenAI/Anthropic/OpenRouter) │
 │  - 记忆系统 (SQLite)                    │
 │  - 会话管理                             │
 └─────────────────────────────────────────┘
@@ -190,6 +216,11 @@ XiaoClaw/
 │   │   ├── mod.rs        # Tool trait
 │   │   ├── registry.rs   # 工具注册表
 │   │   └── builtin.rs    # 内置工具
+│   ├── providers/        # LLM 提供商
+│   │   ├── mod.rs        # Provider trait
+│   │   ├── openai.rs     # OpenAI 提供商
+│   │   ├── anthropic.rs  # Anthropic 提供商
+│   │   └── openrouter.rs # OpenRouter 提供商
 │   ├── memory/            # SQLite 记忆存储
 │   ├── session/           # 会话管理
 │   └── ffi/               # PyO3 绑定
