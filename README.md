@@ -1,6 +1,6 @@
 # XiaoClaw
 
-[English](#english) | [中文](#中文)
+[切换到中文](#中文) | [English](#english)
 
 ---
 
@@ -94,6 +94,27 @@ maturin develop
 
 ### Usage
 
+#### Quick Start
+
+```bash
+# Clone the project
+git clone https://github.com/dianQWQ/XiaoClaw.git
+cd XiaoClaw
+
+# Run with example (set your API key first)
+export OPENAI_API_KEY=sk-...
+cargo run --example run
+```
+
+#### Supported Providers
+
+| Provider | Env Variable | Model Examples |
+|----------|-------------|----------------|
+| OpenAI | `OPENAI_API_KEY` | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo` |
+| Anthropic | `ANTHROPIC_API_KEY` | `claude-3-5-sonnet`, `claude-3-haiku` |
+| OpenRouter | `OPENROUTER_API_KEY` | `openai/gpt-4o`, `google/gemini-pro` |
+| Zhipu (智谱) | `ZHIPU_API_KEY` | `glm-4-flash`, `glm-4` |
+
 #### Rust
 
 ```rust
@@ -174,6 +195,8 @@ MIT
 ---
 
 ## 中文
+
+[Switch to English](#english) | [English](#english)
 
 > ⚡️ 使用 AI 重构的 [nanobot](https://github.com/HKUDS/nanobot) 版本，使用 Rust 重写以获得更好的性能。
 
@@ -264,25 +287,53 @@ maturin develop
 
 ### 使用方式
 
+#### 快速开始
+
+```bash
+# 克隆项目
+git clone https://github.com/dianQWQ/XiaoClaw.git
+cd XiaoClaw
+
+# 运行示例（先设置API Key）
+export OPENAI_API_KEY=sk-...
+cargo run --example run
+```
+
+#### 支持的提供商
+
+| 提供商 | 环境变量 | 模型示例 |
+|--------|----------|----------|
+| OpenAI | `OPENAI_API_KEY` | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo` |
+| Anthropic | `ANTHROPIC_API_KEY` | `claude-3-5-sonnet`, `claude-3-haiku` |
+| OpenRouter | `OPENROUTER_API_KEY` | `openai/gpt-4o`, `google/gemini-pro` |
+| 智谱AI | `ZHIPU_API_KEY` | `glm-4-flash`, `glm-4` |
+
 #### Rust
 
 ```rust
-use nanobot_core::{Agent, AgentConfig, ToolRegistry};
+use xiao_claw::{Agent, AgentConfig, ToolRegistry, providers::{OpenAIProvider, ZhipuProvider}};
+use std::sync::Arc;
 
 #[tokio::main]
 async fn main() {
+    // 配置 Agent
     let config = AgentConfig {
-        model: "claude-3-haiku".into(),
-        provider: "openai".into(),
+        model: "glm-4-flash".into(),  // 或 gpt-4o-mini, claude-3-haiku 等
+        provider: "zhipu".into(),
         temperature: 0.7,
-        max_tokens: Some(4096),
-        system_prompt: None,
+        max_tokens: Some(2048),
+        system_prompt: Some("你是一个helpful的AI助手。".into()),
         tools: vec![],
     };
     
     let tools = Arc::new(ToolRegistry::new());
     let agent = Agent::new(config, tools);
     
+    // 设置 Provider
+    let provider = Arc::new(ZhipuProvider::new("your-api-key".to_string()));
+    agent.set_provider(provider);
+    
+    // 对话
     let response = agent.process("你好！").await;
     println!("回复: {:?}", response);
 }
