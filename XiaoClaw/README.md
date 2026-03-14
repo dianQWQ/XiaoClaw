@@ -6,6 +6,8 @@
 
 ## English
 
+> ⚡️ An AI-reconstructed version of [nanobot](https://github.com/HKUDS/nanobot), rewritten in Rust for better performance.
+
 Ultra-lightweight AI Agent core implemented in Rust, with Python FFI bindings.
 
 Inspired by [nanobot](https://github.com/HKUDS/nanobot) - A lightweight AI assistant written in ~4000 lines of Python.
@@ -147,6 +149,8 @@ MIT
 ---
 
 ## 中文
+
+> ⚡️ 使用 AI 重构的 [nanobot](https://github.com/HKUDS/nanobot) 版本，使用 Rust 重写以获得更好的性能。
 
 超轻量级 AI Agent 核心，使用 Rust 实现，支持 Python FFI 绑定。
 
