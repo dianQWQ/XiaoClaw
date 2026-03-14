@@ -1,6 +1,6 @@
 # XiaoClaw
 
-[切换到中文](#中文) | [English](#english)
+[切换到中文](#chinese) | [English](#english)
 
 ---
 
@@ -194,9 +194,9 @@ MIT
 
 ---
 
-## 中文
+## 中文 {#chinese}
 
-[Switch to English](#english) | [English](#english)
+[Switch to English](#english)
 
 > ⚡️ 使用 AI 重构的 [nanobot](https://github.com/HKUDS/nanobot) 版本，使用 Rust 重写以获得更好的性能。
 
