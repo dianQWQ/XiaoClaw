@@ -1,14 +1,14 @@
 [package]
-name = "nanobot-core"
+name = "xiao-claw"
 version = "0.1.0"
 edition = "2021"
 description = "Ultra-lightweight AI Agent core in Rust"
 license = "MIT"
-authors = ["nanobot team"]
+authors = ["XiaoClaw team"]
 rust-version = "1.75"
 
 [lib]
-name = "nanobot_core"
+name = "xiao_claw"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
@@ -45,4 +45,4 @@ opt-level = "z"
 codegen-units = 1
 
 [package.metadata.maturin]
-name = "nanobot_core"
+name = "xiao_claw"

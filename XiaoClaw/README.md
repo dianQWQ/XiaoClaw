@@ -1,4 +1,4 @@
-# nanobot-rs
+# XiaoClaw
 
 [English](#english) | [中文](#中文)
 
@@ -31,7 +31,7 @@ Inspired by [nanobot](https://github.com/HKUDS/nanobot) - A lightweight AI assis
 ### Project Structure
 
 ```
-nanobot-rs/
+XiaoClaw/
 ├── Cargo.toml              # Rust project config
 ├── src/
 │   ├── lib.rs             # Library entry
@@ -75,13 +75,13 @@ nanobot-rs/
 
 #### Build Rust library
 ```bash
-cd nanobot-rs
+cd XiaoClaw
 cargo build --release
 ```
 
 #### Build Python extension
 ```bash
-cd nanobot-rs/python
+cd XiaoClaw/python
 maturin develop
 ```
 
@@ -173,7 +173,7 @@ MIT
 ### 项目结构
 
 ```
-nanobot-rs/
+XiaoClaw/
 ├── Cargo.toml              # Rust 项目配置
 ├── src/
 │   ├── lib.rs             # 库入口
@@ -217,13 +217,13 @@ nanobot-rs/
 
 #### 构建 Rust 库
 ```bash
-cd nanobot-rs
+cd XiaoClaw
 cargo build --release
 ```
 
 #### 构建 Python 扩展
 ```bash
-cd nanobot-rs/python
+cd XiaoClaw/python
 maturin develop
 ```
 
