@@ -55,3 +55,10 @@ impl ToolResult {
         }
     }
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ToolDefinition {
+    pub name: String,
+    pub description: String,
+    pub parameters: ToolParameters,
+}

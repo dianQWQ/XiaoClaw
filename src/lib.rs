@@ -4,11 +4,12 @@ pub mod memory;
 pub mod tools;
 pub mod session;
 pub mod ffi;
+pub mod providers;
 
-pub use agent::{Agent, Message, Response, MessageRole, ToolCall, LLMProvider};
+pub use agent::{Agent, Message, Response, MessageRole, ToolCall};
 pub use config::{Config, ProviderConfig, ChannelConfig, AgentConfig};
 pub use memory::MemoryStore;
-pub use tools::{Tool, ToolResult, ToolRegistry};
+pub use tools::{Tool, ToolResult, ToolRegistry, ToolDefinition};
 
 pub type Result<T> = std::result::Result<T, Error>;
 

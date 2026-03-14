@@ -2,7 +2,8 @@ pub mod context;
 pub mod loop_core;
 
 pub use context::ContextBuilder;
-pub use loop_core::{AgentLoop, LLMProvider};
+pub use loop_core::AgentLoop;
+pub use crate::providers::LLMProvider;
 
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -54,6 +55,10 @@ impl Agent {
         Self {
             loop_core,
         }
+    }
+    
+    pub fn set_provider(&self, provider: Arc<dyn LLMProvider + Send + Sync>) {
+        self.loop_core.set_provider(provider);
     }
     
     pub async fn process(&self, input: &str) -> Result<Response, super::Error> {

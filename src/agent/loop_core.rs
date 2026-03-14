@@ -1,21 +1,16 @@
-use crate::{config::AgentConfig, tools::ToolRegistry, Error, Message, MessageRole, Response, ToolCall};
+use crate::{config::AgentConfig, tools::ToolRegistry, Error, Message, MessageRole, Response, ToolCall, providers::LLMProvider};
 use parking_lot::RwLock;
 use std::sync::Arc;
-use std::future::Future;
-use std::pin::Pin;
+use async_trait::async_trait;
 
 const MAX_ITERATIONS: usize = 20;
-
-pub trait LLMProvider: Send + Sync {
-    fn chat(&self, model: &str, messages: &[Message]) -> Pin<Box<dyn Future<Output = Result<Response, Error>> + Send + '_>>;
-}
 
 pub struct AgentLoop {
     config: Arc<RwLock<AgentConfig>>,
     tools: Arc<ToolRegistry>,
     messages: RwLock<Vec<Message>>,
     system_prompt: RwLock<Option<String>>,
-    provider: Arc<dyn LLMProvider + Send + Sync>,
+    provider: RwLock<Arc<dyn LLMProvider + Send + Sync>>,
 }
 
 impl AgentLoop {
@@ -28,8 +23,12 @@ impl AgentLoop {
             tools,
             messages: RwLock::new(Vec::new()),
             system_prompt: RwLock::new(None),
-            provider: Arc::new(DefaultProvider),
+            provider: RwLock::new(Arc::new(DefaultProvider)),
         }
+    }
+    
+    pub fn set_provider(&self, provider: Arc<dyn LLMProvider + Send + Sync>) {
+        *self.provider.write() = provider;
     }
     
     pub fn set_system_prompt(&self, prompt: String) {
@@ -86,6 +85,7 @@ impl AgentLoop {
         let config = self.config.read().clone();
         let system_prompt = self.system_prompt.read().clone();
         let messages = self.messages.read().clone();
+        let provider = self.provider.read().clone();
         
         let mut all_messages = Vec::new();
         
@@ -100,7 +100,7 @@ impl AgentLoop {
         
         all_messages.extend(messages);
         
-        self.provider.chat(&config.model, &all_messages).await
+        provider.chat(&config.model, &all_messages).await
     }
     
     async fn execute_tool(&self, tool_call: &ToolCall) -> Result<String, Error> {
@@ -109,11 +109,14 @@ impl AgentLoop {
     }
 }
 
+#[async_trait]
 impl LLMProvider for DefaultProvider {
-    fn chat(&self, _model: &str, _messages: &[Message]) -> Pin<Box<dyn Future<Output = Result<Response, Error>> + Send + '_>> {
-        Box::pin(async {
-            Err(Error::Agent("No LLM provider configured. Use Python FFI to set provider.".to_string()))
-        })
+    async fn chat(&self, _model: &str, _messages: &[Message]) -> Result<Response, Error> {
+        Err(Error::Agent("No LLM provider configured. Use OpenAI, Anthropic, or OpenRouter provider.".to_string()))
+    }
+    
+    async fn chat_streaming(&self, _model: &str, _messages: &[Message], _on_chunk: Box<dyn Fn(String) + Send + Sync>) -> Result<Response, Error> {
+        Err(Error::Agent("Streaming not supported".to_string()))
     }
 }
 
