@@ -1,0 +1,48 @@
+[package]
+name = "nanobot-core"
+version = "0.1.0"
+edition = "2021"
+description = "Ultra-lightweight AI Agent core in Rust"
+license = "MIT"
+authors = ["nanobot team"]
+rust-version = "1.75"
+
+[lib]
+name = "nanobot_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+log = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+regex = "1.0"
+once_cell = "1.19"
+parking_lot = "0.12"
+directories = "5.0"
+rusqlite = { version = "0.31", features = ["bundled"] }
+async-trait = "0.1"
+futures = "0.3"
+reqwest = { version = "0.11", features = ["json"] }
+regex-lite = "0.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+pyo3 = { version = "0.21", optional = true }
+
+[features]
+default = []
+python = ["pyo3"]
+
+[profile.release]
+lto = true
+opt-level = "z"
+codegen-units = 1
+
+[package.metadata.maturin]
+name = "nanobot_core"
